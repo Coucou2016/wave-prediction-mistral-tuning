@@ -11,19 +11,24 @@ Last updated: 2026-08-17 (Round-1 prep). SSOT = `paper/metrics/`.
 | A3 | Predictability drop 0.375→0.250 reported as negative | Enforced |
 | A4 | n=24 pilot scale in Limitations | Enforced |
 | A5 | Sanitize `curve_lora_meta_v2.json` local Windows path | **Fixed 2026-08-17** → HuggingFace model id |
-| A6 | Remove ChatGPT/Cursor process notes from manuscript body | **In progress** (R1–R2) |
-| A7 | Remove script filenames / local paths from manuscript | **In progress** |
-| A8 | Do not mix `numeric_baselines.json` panel leads with curve-subset means | Enforced (numeric_baselines not cited as primary table) |
+| A6 | Remove ChatGPT/Cursor process notes from manuscript body | **Fixed** (v3.0) |
+| A7 | Remove script filenames / local paths from manuscript | **Fixed** (v3.0) |
+| A8 | Do not mix `numeric_baselines.json` panel leads with curve-subset means | Enforced |
+| A9 | Chronos† “weaker” / class-inferior claim | **Fixed** (protocol-only wording) |
+| A10 | Monotonic “RMSE grows with lead” | **Fixed** (non-monotonic caveat) |
+| A11 | Multi-label “trade-off” causal claim | **Fixed** (observation-only) |
+| A12 | Regime skill overclaim under imbalance | **Fixed** (exploratory + skew caveat) |
 
 ## Open / verify next
 
 | ID | Issue | Action |
 |----|-------|--------|
-| B1 | Exact hourly row count \(1.6\times10^5\) | Soften or cite panel stats file if present |
-| B2 | Station ID list reproducibility | Keep + Data Availability pointer to repo |
-| B3 | Regime label skew magnitude | Keep qualitative Limitation until counts exported |
-| B4 | Incomplete reference DOIs | R3 citation pass |
-| B5 | Chronos “weaker” wording | Soften pending ChatGPT R1 advice |
+| B1 | Exact hourly row count | Softened in v3.0; optional panel stats later |
+| B2 | Station ID list reproducibility | Keep + Data Availability |
+| B3 | Regime label skew counts (23/24) | Stated qualitatively; export counts optional |
+| B4 | Incomplete reference DOIs / author lists | R3 citation pass |
+| B5 | Abstract ≤200 words (OE) | R2 polish |
+| B6 | Highlights 3–5 × ≤85 chars | R6 / submission package |
 
 ## Numbers freeze (do not invent)
 
