@@ -1,7 +1,7 @@
 # Schema-constrained significant-wave-height forecasting with instruction-tuned language models: 24-h JSON trajectories and sea-state labels from NDBC buoys
 
 **Target journal:** *Ocean Engineering* (methods / ocean forecasting)  
-**Manuscript version:** 3.0 (2026-08-17) — metrics frozen to public SSOT under the companion repository.
+**Manuscript version:** 3.1 (2026-08-17) — metrics frozen to public SSOT under the companion repository.
 
 **One-sentence argument.** On a pilot NDBC buoy evaluation, instruction-tuned Mistral-7B-Instruct-v0.3 with LoRA recovers parseable JSON `hs_forecast_m` curves and companion sea-state labels relative to the pretrained Base model, while remaining numerically close to—but not superior to—Persistence under transparent lead-alignment caveats.
 
@@ -17,31 +17,29 @@
 
 ## Abstract
 
-Operational marine forecasting needs continuous significant wave height (Hs) trajectories and machine-readable situational labels. Numeric machine-learning models and time-series foundation models are strong continuous Hs predictors, yet they typically do not expose a shared instruction interface that couples forecast sequences with sea-state descriptors. Instruction-tuned large language models (LLMs) can emit structured text, but LLM-for-time-series studies often emphasize root-mean-square error (RMSE) against specialized forecasters rather than parseable ocean schemas under shared buoy-window protocols.
-
-We fine-tune Mistral-7B-Instruct-v0.3 with Low-Rank Adaptation (LoRA) on National Data Buoy Center (NDBC) hourly panels so that the model returns JSON objects containing hourly `hs_forecast_m` curves and, in a separate companion adapter, `wave_regime` / `predictability_24h` labels with free-text notes. On the curve evaluation set (**n = 24** windows; **10** stations), LoRA reduces mean RMSE from **1.271** (Base) to **0.699** with JSON validity **1.0**. On the same windows, Persistence, LightGBM†, and Chronos-T5† yield **0.688**, **0.698**, and **0.951** (dagger denotes aggregation at configured numeric leads, not dense 24-step curves). Classification LoRA raises regime accuracy from **0.042** to **0.417** but lowers predictability accuracy from **0.375** to **0.250**. We position Instruct-LoRA as a structured companion for buoy Hs workflows, not as an RMSE replacement for Persistence or specialized numeric forecasters.
+Instruction-tuned large language models (LLMs) offer machine-readable output interfaces, but their role in ocean forecasting should be separated from claims of numerical superiority. We evaluate Mistral-7B-Instruct-v0.3 adapted with Low-Rank Adaptation (LoRA) for National Data Buoy Center significant-wave-height (Hs) forecasting. A curve adapter emits 24-h hourly Hs trajectories as JSON, while a separate companion adapter produces wave-regime and 24-h predictability labels. On **n = 24** forecast windows from **10** stations, LoRA reduced mean RMSE from **1.271** for the pretrained Base model to **0.699** with JSON validity **1.0**. Persistence, LightGBM†, and Chronos-T5† yielded RMSEs of **0.688**, **0.698**, and **0.951**, respectively; † denotes aggregation at configured numeric leads rather than dense 24-step scoring. For the companion task, regime accuracy increased from **0.042** to **0.417**, whereas predictability accuracy decreased from **0.375** to **0.250**. Because the classification evaluation is small and regime-imbalanced, these results are exploratory. The results support Instruct-LoRA as a structured companion to numeric buoy-forecasting workflows, but do not establish RMSE superiority or robust classification skill.
 
 **Keywords:** significant wave height; NDBC buoys; large language models; LoRA; JSON forecasting; Chronos; LightGBM; wave regime
+
+**Highlights (Ocean Engineering):**
+1. Instruction tuning lowers mean root-mean-square error from 1.271 to 0.699
+2. All reported wave-height curves satisfy the required machine-readable schema
+3. Curve error is numerically close to persistence without superiority claims
+4. Regime accuracy rises, while predictability accuracy declines
 
 ---
 
 ## 1. Introduction
 
-Significant wave height (Hs) at coastal and offshore buoys is a primary observable for navigation, marine operations, and coastal risk awareness. Forecast products must support decisions under changing sea states, where operators care about both the numeric trajectory and a concise description of the regime and how trustworthy the near-term outlook appears.
+Significant wave height (Hs) is a central variable for marine operations, navigation, and coastal risk assessment. Short-term Hs forecasts are therefore commonly formulated as continuous numerical trajectories. For automated downstream workflows, however, a forecast may also need to be delivered in a machine-readable form together with compact descriptors of the evolving sea state. This creates a problem distinct from numerical accuracy alone: whether wave forecasts can be exposed through a structured interface without obscuring the skill limits of the underlying predictor.
 
-Machine-learning (ML) and deep-learning models have become standard tools for buoy Hs prediction. Recurrent and hybrid networks improve short-range skill relative to classical statistical baselines in *Ocean Engineering* settings [1], while multi-station NDBC studies show that tree ensembles remain competitive across U.S. coasts [2,3]. Parallel work uses ML as a residual corrector for numerical weather prediction (NWP) wave products [4], reinforcing that gradient boosting is a serious operational comparator rather than a strawman.
+Data-driven Hs forecasting now spans recurrent and hybrid neural networks, tree-based ensembles, residual correction of numerical forecasts, Transformers, and pretrained time-series foundation models [1–8]. Recurrent and hybrid models have demonstrated short-range Hs forecasting capability [1], while multi-station studies have shown competitive performance from tree ensembles [2,3]. Machine learning has also been used to correct numerical wave forecasts [4]. More recently, Transformer architectures and time-series foundation models such as PatchTST and Chronos have extended the range of available forecasting approaches [5,6], and Chronos has been evaluated specifically for significant-wave-height prediction [8]. These developments make Persistence and established numerical or time-series models necessary comparators for any instruction-based forecasting pipeline.
 
-Beyond single-task regressors, Transformer time-series models and pretrained foundation models now dominate long-horizon forecasting benchmarks. Patching-based Transformers such as PatchTST [5] and zero-shot foundation models such as Chronos [6] and TimeGPT [7] treat continuous series as a primary modality. In ocean engineering, Chronos has already been applied specifically to significant wave height prediction [8], raising a practical question for any new LLM pipeline: what does an instruction-tuned language model add once a strong time-series foundation model is already on the table?
+Text-oriented large language models have been adapted to time-series forecasting through numerical tokenization, prompting, and reprogramming strategies, including LLMTime and Time-LLM [9,10]. At the same time, critical evaluations have shown that an LLM backbone does not necessarily confer superior forecasting accuracy and may add substantial computational cost [11]. Low-Rank Adaptation (LoRA) provides a parameter-efficient route for adapting large pretrained models [12], but efficient adaptation does not itself imply improved predictive skill. Accordingly, the present study treats root-mean-square error as an empirical benchmark rather than as a basis for claiming that an instruction-tuned LLM should replace specialized numerical forecasters.
 
-A separate line of research reprograms or prompts text LLMs for forecasting, including LLMTime [9] and Time-LLM [10]. Critical evaluations caution that removing or ablating the LLM backbone often matches specialized time-series models at much lower compute cost [11]. That finding sets a claim boundary for the present study: we do not seek RMSE supremacy from an Instruct LLM.
+Among the systems reviewed here, continuous Hs and general time-series forecasters primarily return numerical sequences, whereas LLM-for-time-series studies have largely evaluated forecasting accuracy. We consider a different evaluation target: whether an instruction-tuned model can emit a machine-parseable 24-h Hs trajectory while supporting companion sea-state outputs through a separate adapter. The companion task predicts wave-regime and 24-h predictability labels with textual notes; it is not a jointly trained multitask version of the curve model, and the textual fields are not interpreted as calibrated explanations. Structured output is therefore evaluated as an interface capability alongside, rather than in place of, numerical forecast skill.
 
-Among the systems reviewed here, continuous Hs predictors and generic LLM-for-time-series methods leave open a distinct evaluation question for buoy operations: a **structured language interface** that (i) emits machine-parseable Hs sequences under the same chronological windows used by Persistence, LightGBM, and Chronos, and (ii) returns companion sea-state regime and exploratory predictability labels with short textual rationale fields via separate adapters.
-
-Here we present an NDBC-to-JSON instruction-tuning study built on Mistral-7B-Instruct-v0.3. We make three bounded contributions:
-
-1. **Schema-constrained curve generation.** We train LoRA adapters so that Mistral returns JSON containing an hourly `hs_forecast_m` array (24 h horizon), with JSON validity of 1.0 on the reported evaluation set (n = 24).
-2. **Companion sea-state labels (separate adapter).** A companion Instruct-LoRA task predicts `wave_regime` and `predictability_24h` together with free-text notes. These are companion tasks sharing the Instruct family, not a single jointly trained multitask adapter.
-3. **Protocol-aware comparative evaluation with an honest skill boundary.** We compare Mistral Base versus LoRA against Persistence, LightGBM†, and Chronos† on shared windows, and we report where LoRA helps (versus Base) and where it remains numerically close to—or trails—numeric baselines. LightGBM/Chronos aggregates on the curve subset use configured leads (†) and are not claimed to be dense 24-step matches.
+Here we evaluate Mistral-7B-Instruct-v0.3 with LoRA on National Data Buoy Center observations. The study makes three bounded contributions. First, it evaluates schema-constrained generation of hourly 24-h Hs curves in a machine-readable JSON representation. Second, it examines a separate companion adapter for wave-regime and predictability labels while reporting positive and negative classification outcomes symmetrically. Third, it provides a protocol-aware comparison of Mistral Base and LoRA with Persistence, LightGBM†, and Chronos† on shared forecast windows, explicitly identifying the configured-lead aggregation used for † baselines rather than treating those scores as dense 24-step equivalents. The pilot scale and label imbalance are retained as limits on interpretation; the study tests a structured ocean-output interface and does not claim RMSE superiority or statistical equivalence to established numerical forecasters.
 
 The remainder of the paper describes related work (Section 2), data and problem setup (Section 3), methods (Section 4), experiments and results (Section 5), discussion (Section 6), limitations (Section 7), and conclusions (Section 8).
 
@@ -53,7 +51,7 @@ The remainder of the paper describes related work (Section 2), data and problem 
 
 Buoy Hs forecasting has a long ML tradition in ocean engineering journals. Fan et al. demonstrated LSTM-based Hs prediction and SWAN–LSTM hybrids against classical ML baselines [1]. Domala et al. compared Prophet, random forests, and boosting methods on multi-station NDBC data [2]. Chaichitehrani et al. reported stacking ensembles for Hs and period on U.S. East Coast buoys [3]. Recent residual-correction studies use LightGBM/CatBoost to adjust ECMWF/GEFS wave forecasts [4].
 
-**Limitation relative to this work.** These approaches optimize continuous skill metrics. Relative to the systems reviewed above, they do not evaluate an Instruct-style schema that couples Hs sequences with parseable regime/predictability labels under one language interface.
+**Limitation relative to this work.** These approaches optimize continuous skill metrics. Among the systems reviewed here, they do not evaluate an Instruct-style schema that couples Hs sequences with parseable regime/predictability labels under one language interface.
 
 ### 2.2 Time-series Transformers and foundation models
 
@@ -65,7 +63,7 @@ LLMTime demonstrated that pretrained LLMs can forecast by next-token prediction 
 
 ### 2.4 Positioning
 
-Closest adjacent systems either (i) optimize continuous Hs with time-series foundation models [6,8], or (ii) reprogram LLMs for generic time-series RMSE [9,10]. We instead evaluate **sequence-instruction → JSON curve + companion regime/predictability labels** on NDBC windows, with explicit honesty about pilot sample size and numeric skill ceilings.
+Adjacent systems either (i) optimize continuous Hs with time-series foundation models [6,8], or (ii) reprogram LLMs for generic time-series RMSE [9,10]. We instead evaluate **sequence-instruction → JSON curve + companion regime/predictability labels** on NDBC windows, with explicit honesty about pilot sample size and numeric skill ceilings. Relative to Zhai et al. [8], Chronos remains a first-class numeric comparator rather than a competing Instruct-JSON interface. Relative to Tan et al. [11], we treat Instruct-LLM RMSE gains over Base as adaptation evidence, not as grounds for replacing specialized forecasters.
 
 ---
 
@@ -174,12 +172,12 @@ NDBC observations are publicly available from the U.S. National Data Buoy Center
 1. Fan et al., *Ocean Engineering*, 2020. https://doi.org/10.1016/j.oceaneng.2020.107298  
 2. Domala et al., *JCDE*, 2022. https://doi.org/10.1093/jcde/qwac048  
 3. Chaichitehrani et al., *AIES*, 2024. https://doi.org/10.1175/AIES-D-23-0061.1  
-4. Residual-correction LightGBM/CatBoost study, *Ocean Engineering*, 2025. https://doi.org/10.1016/j.oceaneng.2025.120925  
-5. Nie et al., PatchTST, ICLR 2023. https://arxiv.org/abs/2211.14730  
-6. Ansari et al., Chronos, 2024. https://doi.org/10.48550/arXiv.2403.07815  
-7. Garza & Mergenthaler-Canseco, TimeGPT-1. https://doi.org/10.48550/arXiv.2310.03589  
-8. Chronos for significant wave height, *Ocean Engineering*, 2025. https://doi.org/10.1016/j.oceaneng.2025.122502  
-9. Gruver et al., LLMTime, NeurIPS 2023. https://arxiv.org/abs/2310.07820  
-10. Jin et al., Time-LLM, ICLR 2024.  
-11. Tan et al., Are Language Models Actually Useful for Time Series Forecasting?, NeurIPS 2024. https://doi.org/10.48550/arXiv.2406.16964  
-12. Hu et al., LoRA, ICLR 2022. https://doi.org/10.48550/arXiv.2106.09685  
+4. Henriques, M.R., Silva, D., Yanchin, I., Latas, M., Guedes Soares, C., Improving the forecast of wind speed and significant wave height using neural networks and gradient boosting trees. *Ocean Engineering* 327, 120925 (2025). https://doi.org/10.1016/j.oceaneng.2025.120925  
+5. Nie, Y., Nguyen, N.H., Sinthong, P., Kalagnanam, J., A time series is worth 64 words: Long-term forecasting with Transformers (PatchTST). ICLR 2023. https://arxiv.org/abs/2211.14730  
+6. Ansari, A.F., et al., Chronos: Learning the language of time series. 2024. https://doi.org/10.48550/arXiv.2403.07815  
+7. Garza, A., Mergenthaler-Canseco, M., TimeGPT-1. 2023. https://doi.org/10.48550/arXiv.2310.03589  
+8. Zhai, Y., Shi, H., Zhan, C., Wang, Q., You, Z., Wang, N., Improving significant wave height prediction using Chronos models. *Ocean Engineering* (2025). https://doi.org/10.1016/j.oceaneng.2025.122502  
+9. Gruver, N., Finzi, M., Qiu, S., Wilson, A.G., Large language models are zero-shot time series forecasters (LLMTime). NeurIPS 2023. https://arxiv.org/abs/2310.07820  
+10. Jin, M., et al., Time-LLM: Time series forecasting by reprogramming large language models. ICLR 2024.  
+11. Tan, M., Merrill, M.A., Gupta, V., Althoff, T., Hartvigsen, T., Are language models actually useful for time series forecasting? NeurIPS 2024. https://doi.org/10.48550/arXiv.2406.16964  
+12. Hu, E.J., et al., LoRA: Low-rank adaptation of large language models. ICLR 2022. https://doi.org/10.48550/arXiv.2106.09685  
