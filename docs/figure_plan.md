@@ -1,4 +1,4 @@
-# Figure & table plan (paper)
+﻿# Figure & table plan (paper)
 
 **Note:** A parallel agent is restyling plots (SciencePlots + Times New Roman). This file only plans **content and filenames**. Do **not** edit `scripts/10_make_figures.py` here.
 
@@ -84,6 +84,6 @@ mistral_predictability_vs_lgbm_error.png → Fig. 7c / SI
 
 ## Metric freeze for captions (do not invent)
 
-- Curve: Base mean RMSE **1.510**, LoRA **0.977**, Persist **0.884**, LGBM **0.977**, Chronos **0.965** (n=12).  
+- Curve: Base mean RMSE **1.271**, LoRA **0.699**, Persist **0.688**, LGBM **0.698**, Chronos **0.951** (n=24).  
 - Class: regime **0.042→0.417**, predictability **0.375→0.250** (n=24).  
 - Numeric LGBM skill positive from lead **12–72 h** (`numeric_baselines.json`).

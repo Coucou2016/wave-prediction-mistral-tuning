@@ -1,4 +1,4 @@
-# Writing notes — manuscript draft decisions
+﻿# Writing notes — manuscript draft decisions
 
 **Date:** 2026-08-16  
 **Axes (nature-writing):** `task=manuscript` · `paper_type=methods` · `journal=generic` (target *Ocean Engineering*) · `language=en` · sections: full IMRaD scaffold  
@@ -25,12 +25,12 @@
 
 ## Critical honesty gates (do not dilute)
 
-1. **RMSE boundary:** LoRA mean curve RMSE **0.977** improves on Base **1.510** but does **not** beat Persistence **0.884** or Chronos **0.965**; ≈ LightGBM **0.977** on the same pilot windows (n=12).
+1. **RMSE boundary:** LoRA mean curve RMSE **0.699** improves on Base **1.271** but does **not** beat Persistence **0.688** or Chronos **0.951**; ≈ LightGBM **0.698** on the same pilot windows (n=24).
 2. **Predictability regression:** LoRA predictability accuracy **0.250** < Base **0.375** (n=24). Report in Results; demote from Abstract headline.
 3. **Rationale wording:** Prefer *textual rationale* / *uncertainty descriptor*. Avoid *explainable AI* and *calibrated UQ* without coverage/CRPS.
 4. **Training-label audit (2026-08-16):** Curve JSONL `reason` strings and classification `notes` appear **template stubs** (e.g. single repeated English/Chinese sentence; `uncertainty_level` often constant `medium`). Manuscript must **not** claim diverse supervised rationale learning. Schema + parseability are the supported claims; qualitative reason fidelity is future work.
 5. **Differentiation:** vs Orca (buoy→grid estimation); vs Zhai Chronos-SWH (numeric Chronos optimization). We study Instruct LLM as structured companion *beside* Chronos.
-6. **Sample size:** Curve eval n=12; classification n=24. Pilot language throughout.
+6. **Sample size:** Curve eval n=24; classification n=24. Pilot language throughout.
 
 ## Intro variant chosen
 

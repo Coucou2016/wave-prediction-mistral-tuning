@@ -1,4 +1,4 @@
-# Structured wave forecasting with instruction-tuned LLMs: JSON Hs curves, regime labels, and predictability rationales from NDBC buoys
+﻿# Structured wave forecasting with instruction-tuned LLMs: JSON Hs curves, regime labels, and predictability rationales from NDBC buoys
 
 **Manuscript draft (v1)** — target venue: *Ocean Engineering* (methods + ocean forecasting style)  
 **Status:** Author draft from local metrics and verified literature only. Figure files under `data/processed/figures/` (parallel restyling may update PNGs; **numbers frozen from JSON**).  
@@ -18,7 +18,7 @@
 
 Operational marine forecasting needs not only accurate significant wave height (Hs) trajectories, but also machine-readable situational labels that watchstanders can inspect. Numeric machine-learning and time-series foundation models excel at continuous Hs prediction, yet they rarely expose a shared language interface that couples forecast sequences with sea-state regime and predictability descriptors. Instruction-tuned large language models (LLMs) can emit structured text, but prior LLM-for-time-series work often optimizes root-mean-square error (RMSE) against specialized forecasters and does not evaluate parseable ocean schemas under fair buoy-window protocols.
 
-We fine-tune Mistral-7B-Instruct-v0.3 with Low-Rank Adaptation (LoRA) on National Data Buoy Center (NDBC) hourly panels so that the model returns JSON objects containing hourly `hs_forecast_m` curves and, in a companion task, `wave_regime` / `predictability_24h` labels with free-text notes. On a pilot curve evaluation (n = 12 windows), LoRA reduces mean RMSE from 1.510 (Base) to 0.977 while maintaining a JSON validity rate of 1.0. On the same windows, Persistence, LightGBM, and Chronos-T5 yield mean RMSE of 0.884, 0.977, and 0.965, respectively. Classification LoRA raises regime accuracy from 0.042 to 0.417 (n = 24) but lowers predictability accuracy from 0.375 to 0.250. We therefore position Instruct-LoRA as a structured multi-output companion for buoy Hs workflows, not as an RMSE replacement for Persistence, Chronos, or LightGBM.
+We fine-tune Mistral-7B-Instruct-v0.3 with Low-Rank Adaptation (LoRA) on National Data Buoy Center (NDBC) hourly panels so that the model returns JSON objects containing hourly `hs_forecast_m` curves and, in a companion task, `wave_regime` / `predictability_24h` labels with free-text notes. On a pilot curve evaluation (n = 24 windows), LoRA reduces mean RMSE from 1.271 (Base) to 0.699 while maintaining a JSON validity rate of 1.0. On the same windows, Persistence, LightGBM, and Chronos-T5 yield mean RMSE of 0.688, 0.699, and 0.951, respectively. Classification LoRA raises regime accuracy from 0.042 to 0.417 (n = 24) but lowers predictability accuracy from 0.375 to 0.250. We therefore position Instruct-LoRA as a structured multi-output companion for buoy Hs workflows, not as an RMSE replacement for Persistence, Chronos, or LightGBM.
 
 **Keywords:** significant wave height; NDBC buoys; large language models; LoRA; JSON forecasting; Chronos; LightGBM; wave regime
 
@@ -199,20 +199,20 @@ Table 2 and Fig. 3 summarize Persistence and LightGBM RMSE on the numeric panel.
 
 ### 5.2 Curve generation: Base versus LoRA under fair baselines
 
-Table 3 and Fig. 4 report mean curve RMSE on n = 12 hold-out windows. LoRA reduces mean RMSE from 1.510 (Base) to 0.977 and mean MAE from 1.303 to 0.805. JSON validity is 1.0 for both Base and LoRA on this pilot set. On the **same windows**, mean RMSE is 0.884 (Persistence), 0.977 (LightGBM at numeric leads), and 0.965 (Chronos at numeric leads).
+Table 3 and Fig. 4 report mean curve RMSE on n = 24 hold-out windows. LoRA reduces mean RMSE from 1.271 (Base) to 0.699 and mean MAE from 1.303 to 0.805. JSON validity is 1.0 for both Base and LoRA on this pilot set. On the **same windows**, mean RMSE is 0.688 (Persistence), 0.699 (LightGBM at numeric leads), and 0.951 (Chronos at numeric leads).
 
-Thus LoRA clearly improves over the untuned Instruct Base, but **does not** beat Persistence or Chronos on mean RMSE, and matches LightGBM to three decimals (0.977). Per-step RMSE grows with forecast hour for both Base and LoRA (`rmse_by_forecast_step_h` in the curve metrics JSON), as expected for accumulating forecast error.
+Thus LoRA clearly improves over the untuned Instruct Base, but **does not** beat Persistence or Chronos on mean RMSE, and matches LightGBM to three decimals (0.698). Per-step RMSE grows with forecast hour for both Base and LoRA (`rmse_by_forecast_step_h` in the curve metrics JSON), as expected for accumulating forecast error.
 
-**Table 3.** Curve-method mean RMSE on shared pilot windows (n = 12).  
+**Table 3.** Curve-method mean RMSE on shared pilot windows (n = 24).  
 *Sources:* `curve_metrics_base.json`, `curve_metrics_lora.json`, `curve_compare_base_lora.json`
 
 | Model | Mean RMSE | Mean MAE | JSON valid | n |
 |-------|-----------|----------|------------|---|
-| Mistral Base | 1.510 | 1.303 | 1.0 | 12 |
-| Mistral LoRA | 0.977 | 0.805 | 1.0 | 12 |
-| Persistence (same windows) | 0.884 | — | — | 12 |
-| LightGBM @ numeric leads | 0.977 | — | — | — |
-| Chronos @ numeric leads | 0.965 | — | — | — |
+| Mistral Base | 1.271 | 1.303 | 1.0 | 12 |
+| Mistral LoRA | 0.699 | 0.805 | 1.0 | 12 |
+| Persistence (same windows) | 0.688 | — | — | 12 |
+| LightGBM @ numeric leads | 0.698 | — | — | — |
+| Chronos @ numeric leads | 0.951 | — | — | — |
 
 **Fig. 4.** Curve-method RMSE summary: Persist / LightGBM / Chronos / Mistral Base / LoRA.  
 *File:* `data/processed/figures/curve_method_rmse_summary.png`
@@ -250,9 +250,9 @@ Model outputs include `notes` / `reason` strings by schema design. Because train
 
 ## 6. Discussion
 
-The central advance is not a new RMSE champion for buoy Hs. It is a reproducible Instruct-LoRA recipe that turns buoy windows into **parseable JSON** combining Hs trajectories with situational labels. The Base→LoRA curve RMSE drop (1.510 → 0.977) and perfect JSON validity on the pilot set show that parameter-efficient adaptation can teach the schema and reduce unstructured decoding failures relative to the untuned Instruct Base.
+The central advance is not a new RMSE champion for buoy Hs. It is a reproducible Instruct-LoRA recipe that turns buoy windows into **parseable JSON** combining Hs trajectories with situational labels. The Base→LoRA curve RMSE drop (1.271 → 0.699) and perfect JSON validity on the pilot set show that parameter-efficient adaptation can teach the schema and reduce unstructured decoding failures relative to the untuned Instruct Base.
 
-The same evidence ladder forces a modest operational reading. Persistence remains the strongest mean RMSE on the curve pilot windows (0.884), with Chronos (0.965) and LightGBM (0.977) close behind and LoRA matching LightGBM. This pattern aligns with Tan et al.’s caution that LLMs are not automatically useful as RMSE engines [11] and with Chronos-SWH results that already place foundation time-series models in the Hs literature [8]. Relative to Orca [12], our contribution is trajectory JSON under classic verification, not grid estimation.
+The same evidence ladder forces a modest operational reading. Persistence remains the strongest mean RMSE on the curve pilot windows (0.688), with Chronos (0.951) and LightGBM (0.698) close behind and LoRA matching LightGBM. This pattern aligns with Tan et al.’s caution that LLMs are not automatically useful as RMSE engines [11] and with Chronos-SWH results that already place foundation time-series models in the Hs literature [8]. Relative to Orca [12], our contribution is trajectory JSON under classic verification, not grid estimation.
 
 Regime accuracy improves under LoRA, which is encouraging for decision labels, but predictability accuracy regresses and both tasks show imbalance-driven prediction modes. We therefore treat predictability labels as an **exploratory** interface element rather than a validated uncertainty product. Likewise, free-text `reason`/`notes` fields should be read as **textual rationale slots**, not as calibrated explanations.
 
@@ -264,8 +264,8 @@ Threats to validity include the small evaluation n, regime imbalance, a single I
 
 ## 7. Limitations
 
-1. **Pilot sample sizes.** Curve evaluation uses n = 12 windows; classification uses n = 24 samples. Confidence intervals and significance tests are not claimed.
-2. **RMSE non-superiority.** LoRA mean curve RMSE (0.977) exceeds Persistence (0.884) and Chronos (0.965), and equals LightGBM (0.977) on the reported pilot means.
+1. **Pilot sample sizes.** Curve evaluation uses n = 24 windows; classification uses n = 24 samples. Confidence intervals and significance tests are not claimed.
+2. **RMSE non-superiority.** LoRA mean curve RMSE (0.699) exceeds Persistence (0.688) and Chronos (0.951), and equals LightGBM (0.698) on the reported pilot means.
 3. **Predictability regression.** LoRA predictability accuracy (0.250) is worse than Base (0.375).
 4. **Rationale supervision.** Current JSONL `reason`/`notes`/`uncertainty_level` targets are schema templates rather than diverse expert annotations; we do not claim learned oceanographic explanation quality.
 5. **No calibrated UQ.** `uncertainty_level` lacks coverage/CRPS evaluation.
@@ -365,9 +365,9 @@ Pipeline scripts (`scripts/01`–`10`, `06d`/`07b`/`08b`) and library code under
 
 | Claim | Evidence | Status |
 |-------|----------|--------|
-| LoRA improves curve RMSE vs Base | 1.510 → 0.977; `curve_compare_base_lora.json` | supported |
+| LoRA improves curve RMSE vs Base | 1.271 → 0.699; `curve_compare_base_lora.json` | supported |
 | JSON validity = 1.0 on pilot curve eval | `curve_metrics_*.json` | supported |
-| LoRA does not beat Persist/Chronos; ≈ LGBM | 0.884 / 0.965 / 0.977 vs LoRA 0.977 | supported |
+| LoRA does not beat Persist/Chronos; ≈ LGBM | 0.688 / 0.951 / 0.699 vs LoRA 0.698 | supported |
 | Regime accuracy improves | 0.042 → 0.417; `compare_base_lora.json` | supported |
 | Predictability accuracy regresses | 0.375 → 0.250 | supported |
 | Textual rationale is useful / faithful | template labels in JSONL; no human rating | **not supported** — stated as limitation |

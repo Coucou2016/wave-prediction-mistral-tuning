@@ -1,17 +1,20 @@
-# Structured wave forecasting with instruction-tuned LLMs: JSON Hs curves, regime labels, and predictability rationales from NDBC buoys
+# Schema-constrained significant-wave-height forecasting with instruction-tuned language models: 24-h JSON trajectories and sea-state labels from NDBC buoys
 
-**Manuscript draft (v2)** — target: *Ocean Engineering* (methods + ocean forecasting)  
-**Status:** Author draft from local metrics under `paper/metrics/` (2026-08-16 curve LoRA v2 eval). Numbers are not invented.  
+**Manuscript draft (v2.1)** — target: *Ocean Engineering* (methods + ocean forecasting)  
+**Status:** Author draft from local metrics under `paper/metrics/` (2026-08-16 curve LoRA v2 eval). Numbers are not invented. `paper/metrics/*.json` is the single source of truth (supersedes any older n≈12 notes in `docs/`).  
 **nature-writing axes:** `task=manuscript` · `paper_type=methods` · `journal=generic` (*Ocean Engineering*) · `language=en`  
-**Code/data pointers:** https://github.com/Coucou2016/wave-prediction-mistral-tuning · figures in `paper/figures/` (SciencePlots + Times New Roman)
+**Code/data pointers:** https://github.com/Coucou2016/wave-prediction-mistral-tuning · figures in `paper/figures/` (SciencePlots + Times New Roman)  
+**ChatGPT Round-1 ADOPT:** schema-constrained product framing; companion (not joint multitask) adapters; demote predictability from title; keep negative predictability result.
 
-**One-sentence argument.** In NDBC buoy significant-wave-height forecasting, we show that instruction-tuned Mistral-7B-Instruct-v0.3 with LoRA can emit parseable JSON `hs_forecast_m` curves together with companion regime/predictability labels, supported by Base→LoRA gains and fair Persistence / LightGBM / Chronos comparisons, with the boundary that pilot curve RMSE does **not** claim supremacy over specialized numeric forecasters.
+**One-sentence argument.** In NDBC buoy significant-wave-height forecasting, we show that instruction-tuned Mistral-7B-Instruct-v0.3 with LoRA can emit parseable JSON `hs_forecast_m` curves together with companion sea-state labels, supported by Base→LoRA gains and fair Persistence / LightGBM / Chronos comparisons, with the boundary that pilot curve RMSE does **not** claim supremacy over specialized numeric forecasters.
 
 ---
 
 ## Title
 
-**Structured wave forecasting with instruction-tuned LLMs: JSON Hs curves, regime labels, and predictability rationales from NDBC buoys**
+**Schema-constrained significant-wave-height forecasting with instruction-tuned language models: 24-h JSON trajectories and sea-state labels from NDBC buoys**
+
+*Alternate (OE-leaning):* Structured buoy wave forecasting with Mistral-LoRA: Evaluation of JSON significant-wave-height trajectories and sea-state labels
 
 ---
 
@@ -40,8 +43,8 @@ What remains under-explored for buoy operations is a **structured language inter
 Here we present an end-to-end NDBC-to-JSONL-to-LoRA pipeline built on Mistral-7B-Instruct-v0.3. We make three bounded contributions:
 
 1. **Schema-constrained curve generation.** We train LoRA adapters so that Mistral returns JSON containing an hourly `hs_forecast_m` array (24 h horizon), with JSON validity of 1.0 on the reported eval set.
-2. **Multi-task language labels.** A companion Instruct-LoRA task predicts `wave_regime` and `predictability_24h` together with free-text notes, linking numeric context to decision-oriented labels.
-3. **Fair comparative evaluation with an honest skill boundary.** We compare Mistral Base versus LoRA against Persistence, LightGBM, and Chronos on shared windows, and we report where LoRA helps (versus Base) and where it remains comparable to—or trails—numeric baselines.
+2. **Companion sea-state labels (separate adapter).** A companion Instruct-LoRA task predicts `wave_regime` and `predictability_24h` together with free-text notes. These are **companion tasks** sharing the Instruct family, not a single jointly trained multitask adapter.
+3. **Fair comparative evaluation with an honest skill boundary.** We compare Mistral Base versus LoRA against Persistence, LightGBM, and Chronos on shared windows, and we report where LoRA helps (versus Base) and where it remains comparable to—or trails—numeric baselines. LightGBM/Chronos aggregates on the curve subset use configured leads (†) and are not claimed to be dense 24-step apples-to-apples matches.
 
 The remainder of the paper describes related work (Section 2), data and problem setup (Section 3), methods (Section 4), experiments and results (Section 5), discussion (Section 6), limitations (Section 7), and conclusions (Section 8).
 

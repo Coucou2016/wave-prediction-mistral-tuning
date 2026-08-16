@@ -1,4 +1,4 @@
-# Literature review notes (verified)
+﻿# Literature review notes (verified)
 
 **Date:** 2026-08-16  
 **ChatGPT conversation (web search ON):** https://chatgpt.com/c/6a812828-a690-83ea-a218-25721d148a25  
@@ -70,7 +70,7 @@ Typical spine (IMRaD-leaning):
 | Fair baselines table | PatchTST / OE Hs papers | Persistence, LightGBM, Chronos, Mistral Base vs LoRA on **same windows** |
 | Critical self-position | NeurIPS 2024 “Are LLMs useful…” | Explicitly agree: numeric RMSE may lag; value is **structured + textual rationale** (not unproven “explainability”) |
 | Data transparency | Domala / Chaichitehrani | List NDBC IDs, resample rule, split seed |
-| Pilot honesty | — | Report small `n` (curve n=12; class n=24) as limitation |
+| Pilot honesty | — | Report small `n` (curve **n=24**, 10 stations; class n=24). Older n=24 (v2; older pilot superseded) pilot superseded by `paper/metrics/` v2. |
 
 ---
 
@@ -96,7 +96,7 @@ ChatGPT (search ON) correctly stressed: literature **does not** support “LLM b
 
 1. **Structured generation:** Instruct LoRA emits parseable `hs_forecast_m` JSON with 100% JSON validity on pilot eval (`curve_metrics_*.json`).  
 2. **Multi-output oceanology language:** same LLM family covers **regime classification** + **predictability labels** + free-text **reason** (`metrics_base/lora.json`).  
-3. **Fair triad comparison:** persistence / LightGBM / Chronos / Mistral Base→LoRA on shared holdout windows—LoRA curve RMSE improves vs Base (1.510→0.977) but remains **near** Chronos/LGBM and **above** persistence mean RMSE (0.884).
+3. **Fair triad comparison:** persistence / LightGBM / Chronos / Mistral Base→LoRA on shared holdout windows—LoRA curve RMSE improves vs Base (1.271→0.699) but remains **near** Chronos/LGBM and **above** persistence mean RMSE (0.688).
 
 **Unsafe claims (do not write):** “first LLM for waves”; “outperforms Chronos/LGBM”; “production-ready storm forecasting.”
 

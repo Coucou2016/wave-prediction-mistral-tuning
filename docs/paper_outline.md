@@ -1,4 +1,4 @@
-# Paper outline — Mistral LoRA for buoy Hs forecasting
+﻿# Paper outline — Mistral LoRA for buoy Hs forecasting
 
 **nature-writing routing (stated for correction):**  
 `task=manuscript` · `paper_type=methods` · `journal=generic` (target: *Ocean Engineering*; Nat-family claim discipline only) · sections: full scaffold · language: outline in EN with ZH notes where useful.
@@ -53,8 +53,8 @@ We make three **bounded** contributions:
 | Context | Operational need for Hs + situational labels | Engineering stake |
 | Gap | Numeric models lack natural-language rationale; LLMs lack ocean schema | Related work |
 | Approach | Mistral LoRA → JSON curves + regime/predictability | Methods |
-| Result | Curve RMSE Base 1.510 → LoRA 0.977 (n=12); regime acc 0.042 → 0.417 (n=24); numeric LGBM/Chronos still competitive | Local metrics JSON |
-| Boundary | Pilot scale; LoRA curve RMSE ≈ LGBM, > persistence | Honest limit |
+| Result | Curve RMSE Base 1.271 → LoRA 0.699 (n=24, 10 stations; json_valid=1.0); Persist 0.688 / LGBM† 0.698 / Chronos† 0.951; regime 0.042 → 0.417; predictability 0.375 → 0.250 | `paper/metrics/*.json` (SSOT) |
+| Boundary | Pilot scale; LoRA ≈ Persist/LGBM on this subset — **not** numeric supremacy | Honest limit |
 
 ### 1. Introduction
 
@@ -118,7 +118,7 @@ Evidence ladder:
 
 2. **Curve generation Base vs LoRA**  
    - Data: `curve_metrics_*.json`, `curve_compare_base_lora.json`  
-   - Key numbers: mean RMSE 1.510 → 0.977; JSON valid 1.0; baselines persist 0.884 / LGBM 0.977 / Chronos 0.965  
+   - Key numbers: mean RMSE 1.271 → 0.699; JSON valid 1.0; baselines persist 0.688 / LGBM 0.698 / Chronos 0.951  
    - Fig: `curve_method_rmse_summary.png`, `forecast_panel_mistral_lora_*.png`  
 
 3. **Classification Base vs LoRA**  
@@ -142,8 +142,8 @@ Evidence ladder:
 
 ### 7. Limitations (explicit)
 
-- Curve eval **n=12**; classification **n=24**.  
-- LoRA curve mean RMSE **0.977** vs persistence **0.884**, Chronos **0.965**, LGBM **0.977**.  
+- Curve eval **n=24**; classification **n=24**.  
+- LoRA curve mean RMSE **0.699** vs persistence **0.688**, Chronos **0.951**, LGBM **0.698**.  
 - Predictability LoRA **worse** than Base on pilot.  
 - Figures/metrics may be mid-refresh (SciencePlots restyle by parallel agent)—freeze numbers from JSON files above.  
 - No claim of spatial generalization beyond panel stations.
@@ -194,11 +194,11 @@ Need: ops want Hs numbers AND situational labels/explanations
 
 | Model | mean_rmse | notes |
 |-------|-----------|-------|
-| Mistral Base | 1.510 | n=12, json_valid=1.0 |
-| Mistral LoRA | 0.977 | n=12, json_valid=1.0 |
-| Persistence (same windows) | 0.884 | |
-| LightGBM @ numeric leads | 0.977 | |
-| Chronos @ numeric leads | 0.965 | |
+| Mistral Base | 1.271 | n=24, json_valid=1.0 |
+| Mistral LoRA | 0.699 | n=24, json_valid=1.0 |
+| Persistence (same windows) | 0.688 | |
+| LightGBM @ numeric leads | 0.698 | |
+| Chronos @ numeric leads | 0.951 | |
 
 ### Classification (`compare_base_lora.json`)
 

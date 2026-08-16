@@ -1,4 +1,4 @@
-# 结构化海浪预报研究科研报告
+﻿# 结构化海浪预报研究科研报告
 
 副标题：基于 NDBC 浮标与 Mistral Instruct-LoRA 的 JSON 曲线、海况节律与可预测性标签
 
@@ -14,7 +14,7 @@
 
 业务海浪产品不仅需要 Significant Wave Height (Hs) 的连续轨迹，还需要可机读、可检查的情境标签。本报告基于真实 NDBC 数据与本地评估 JSON，总结端到端流水线：issue-time 窗口 → 数值基线（Persistence / LightGBM）与 Chronos-T5 → 分类 LoRA（`wave_regime` / `predictability_24h`）→ 曲线 LoRA（JSON `hs_forecast_m`）→ SciencePlots 图件。
 
-曲线 pilot（n = 12）：LoRA 平均 RMSE 从 1.510（Base）降至 0.977，JSON 有效率均为 1.0。同窗 Persistence / LightGBM / Chronos 均值 RMSE 分别为 0.884 / 0.977 / 0.965。分类（n = 24）：regime 准确率 0.042 → 0.417；predictability 准确率 0.375 → 0.250（下降）。
+曲线 pilot（n = 24）：LoRA 平均 RMSE 从 1.271（Base）降至 0.699，JSON 有效率均为 1.0。同窗 Persistence / LightGBM / Chronos 均值 RMSE 分别为 0.688 / 0.698 / 0.951。分类（n = 24）：regime 准确率 0.042 → 0.417；predictability 准确率 0.375 → 0.250（下降）。
 
 **定位：** Instruct-LoRA 是结构化多输出伴侣，不是 Persistence/Chronos/LightGBM 的 RMSE 替代品；`reason` 为模板化文本槽位，不等于正式可解释性；`uncertainty_level` 不是校准概率不确定度。
 
@@ -62,7 +62,7 @@
 1. 真实 NDBC 下载与质控、1 h 重采样、面板拼装（scripts/02–04）。
 2. 构造 issue-time 窗口；训练 Persistence/LightGBM；运行 Chronos（05 / 05b）。
 3. 导出分类 JSONL，划分数据集，LoRA 训练与 Base 对比（06 / 06b / 07 / 08；n=24）。
-4. 导出曲线 JSONL（压缩 Hs 历史），pilot 训练与 hold-out 评估（06d / 07b / 08b；n=12）。
+4. 导出曲线 JSONL（压缩 Hs 历史），pilot 训练与 hold-out 评估（06d / 07b / 08b；n=24）。
 5. 同窗汇总 Persistence / LightGBM / Chronos / Mistral 指标。
 6. SciencePlots + Times New Roman 出图至 `data/processed/figures/`。
 
@@ -78,7 +78,7 @@
 | 48 | 0.924 | 0.594 | 0.811 | 0.123 |
 | 72 | 0.994 | 0.657 | 0.841 | 0.154 |
 
-来源：`numeric_baselines.json`。口径为数值面板，不同于曲线 n=12 同窗均值。
+来源：`numeric_baselines.json`。口径为数值面板，不同于曲线 n=24 同窗均值。
 
 ### 4.2 分类 Base vs LoRA
 
@@ -93,11 +93,11 @@
 
 | 模型 | Mean RMSE | Mean MAE | JSON valid | n | 口径 |
 |---|---:|---:|---:|---:|---|
-| Mistral Base | 1.510 | 1.303 | 1.0 | 12 | 曲线 JSON→未来 24 h Hs |
-| Mistral LoRA | 0.977 | 0.805 | 1.0 | 12 | 同上 |
-| Persistence | 0.884 | — | — | 12 | 与曲线同窗 |
-| LightGBM | 0.977 | — | — | — | 数值 lead 聚合均值 |
-| Chronos-T5 | 0.965 | — | — | — | 数值 lead 聚合均值 |
+| Mistral Base | 1.271 | 1.303 | 1.0 | 12 | 曲线 JSON→未来 24 h Hs |
+| Mistral LoRA | 0.699 | 0.805 | 1.0 | 12 | 同上 |
+| Persistence | 0.688 | — | — | 12 | 与曲线同窗 |
+| LightGBM | 0.698 | — | — | — | 数值 lead 聚合均值 |
+| Chronos-T5 | 0.951 | — | — | — | 数值 lead 聚合均值 |
 
 **不得将 LoRA 表述为优于 Persistence 或 Chronos。**
 
@@ -132,7 +132,7 @@ Base→LoRA 的曲线 RMSE 下降与 JSON validity=1.0 表明参数高效适配�
 
 | 风险/限制 | 表现 | 缓解 |
 |---|---|---|
-| 小样本 pilot | 曲线 n=12；分类 n=24 | 扩大 hold-out；避免生产声称 |
+| 小样本 pilot | 曲线 n=24；分类 n=24 | 扩大 hold-out；避免生产声称 |
 | RMSE 非最优 | LoRA > Persistence/Chronos | 定位结构化伴侣 |
 | Predictability 回退 | 0.375→0.250；塌缩为 high | 重标、均衡、校准指标 |
 | 模板理由 | 非专家多样化标注 | 人评/物理约束监督 |
@@ -141,7 +141,7 @@ Base→LoRA 的曲线 RMSE 下降与 JSON validity=1.0 表明参数高效适配�
 
 ## 6. 主要结论
 
-1. 曲线 pilot（n=12）上，LoRA 相对 Base 降低平均 RMSE，并保持 JSON 全有效。
+1. 曲线 pilot（n=24）上，LoRA 相对 Base 降低平均 RMSE，并保持 JSON 全有效。
 2. LoRA 平均 RMSE 不低于 Persistence/Chronos；不得宣传为数值替代方案。
 3. regime 准确率上升，predictability 准确率下降；必须完整报告。
 4. 文本理由与 uncertainty 字段保持描述性，不作校准 UQ 或正式可解释性声明。

@@ -1,28 +1,44 @@
 # ChatGPT research session log
 
+## Paper / literature thread (THIS TURN — primary)
+
+- **URL:** https://chatgpt.com/c/6a819cc9-f5b8-83ea-87fb-876a79e63d01  
+- **Title (UI):** 论文顾问任务  
+- **Date:** 2026-08-16  
+- **Mode:** Web search requested explicitly; UI showed「正在搜索 github.com」during Round 1. Model「极高」.  
+- **Attachments:** none (text-only + public GitHub URL).  
+- **GitHub given to ChatGPT:** https://github.com/Coucou2016/wave-prediction-mistral-tuning  
+
+### Rounds (≥5 planned)
+
+| Round | Deliverable | Status | Adopt / Reject |
+|-------|-------------|--------|----------------|
+| 1 | Framework + literature shortlist + honest innovation | Started; rate-limited mid-reply after acknowledging structured-JSON claim boundary | **ADOPT** keep claim boundary (JSON interface + Base→LoRA + fair baselines; not RMSE supremacy). Continue after cooldown. |
+| 2 | Related-work cluster synthesis | Pending cooldown | — |
+| 3 | Methods wording (compression + LoRA recipe) | Pending | — |
+| 4 | Results wording with frozen v2 metrics | Pending | — |
+| 5 | Innovation / limitations / figure captions | Pending | — |
+
+### Rate limit note
+During Round 1 generation, ChatGPT showed modal「请求过于频繁」and temporarily blocked conversation history access. Operator waits and retries; no CAPTCHA/login failure.
+
+---
+
+## Prior related threads (context only; not this-turn primary)
+
 - **URL:** https://chatgpt.com/c/6a812828-a690-83ea-a218-25721d148a25  
 - **Title (UI):** LLM海洋波浪预报创新 / LLM 海洋预报文献  
-- **Date:** 2026-08-16  
-- **Mode:** Web search explicitly enabled（菜单「网页搜索」）; model UI showed「极高」.  
-- **Attachments:** none (text-only, sanitized metrics).  
-- **Problems resolved in-thread:** literature shortlist; writing architecture; journal ranking; innovation positioning; wording risks (reason/uncertainty); Orca & Chronos-SWH differentiation.  
-- **Independent verification:** see `literature_review_notes.md` (WebSearch/DOI; nature-academic-search MCP unavailable → T1-style DOI/publisher checks).
+- **Mode:** Web search ON. Literature shortlist + writing architecture.  
+- **Independent verification:** `docs/literature_review_notes.md`
 
-## Manuscript drafting pass (2026-08-16, later)
+- **URL:** https://chatgpt.com/c/6a80a918-cd30-83ea-ab55-b28f4dfbdcfc  
+- **Title (UI):** 模型训练与评估建议  
+- **Ask:** compressed Tp/wind; expand samples; honesty vs Persist.  
+- **Advice applied:** ADOPT compression + larger v2 train; MODIFY claim (Base↑, on-par numeric; do not claim beat Persistence).
 
-- **ChatGPT consult:** none (framing already settled; no new browser session).  
-- **Deliverable:** `docs/manuscript_draft.md` + `docs/writing_notes.md`.  
-- **Extra honesty gate discovered locally:** JSONL `reason`/`notes`/`uncertainty_level` training targets are template stubs — reflected in Limitations.
+---
 
+## Local manuscript landing
 
-## Curve LoRA v2 strategy consult (2026-08-16)
-
-- **URL:** https://chatgpt.com/c/6a80a918-cd30-83ea-ab55-b28f4dfbdcfc
-- **Title (UI):** 模型训练与评估建议
-- **Attachments:** none (text CONTEXT only).
-- **Ask:** compressed Tp/wind features; expand to 1024/200 at 24h; station round-robin; honesty vs Persist.
-- **Advice (independent review applied):**
-  - A) ADOPT compressed mean/trend/last_N (no 168× Tp/wind).
-  - B) ADOPT 1024 samples / 200 steps + station round-robin as stage-2.
-  - C) REJECT mandatory 6h-first; keep 24h + RMSE-by-lead.
-  - D) MODIFY claim: LoRA beats Base and is on-par with numeric baselines; do **not** claim beat Persistence yet.
+- `paper/manuscript.md` — nature-writing methods draft with **v2 metrics** (n=24).  
+- Figures: `paper/figures/` (SciencePlots). Metrics: `paper/metrics/`.
