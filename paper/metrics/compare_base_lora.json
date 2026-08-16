@@ -1,0 +1,12 @@
+{
+  "base": {
+    "regime_accuracy": 0.041666666666666664,
+    "predictability_accuracy": 0.375,
+    "n": 24
+  },
+  "lora": {
+    "regime_accuracy": 0.4166666666666667,
+    "predictability_accuracy": 0.25,
+    "n": 24
+  }
+}

@@ -1,0 +1,25 @@
+# Representative panel: NDBC first (reliable public HTTP). Expand years/stations as needed.
+project_root: "."
+
+ndbc:
+  years: [2019, 2020]
+  stations:
+    - "46042"   # Monterey Bay
+    - "46047"   # Tanner Banks
+    - "41010"   # Gray's Reef
+    - "44013"   # Boston approach
+    - "42040"   # Mobile Bay
+    - "51000"   # N Pacific
+    - "46026"   # Pacific SW
+    - "46025"   # Santa Monica Basin
+    - "46246"   # San Diego
+    - "51002"   # Hawaii
+
+cdip:
+  deployments:
+    - id: "100p1"
+      opendap_url: "https://thredds.cdip.ucsd.edu/thredds/dodsC/cdip/archive/100p1/100p1_historic.nc"
+
+cmems:
+  enabled: true
+  # If false, skip CMEMS download unless --force

@@ -1,0 +1,8 @@
+# 复制为 local_model.override.yaml 或直接写入 model_config.yaml 的 lora 段
+# 本地已下载官方 Mistral 时无需 HF_TOKEN
+lora:
+  local_model_path: "D:/models/Mistral-7B-Instruct-v0.3"
+  local_files_only: true
+  use_4bit: true
+  max_train_samples: 512
+  num_epochs: 2

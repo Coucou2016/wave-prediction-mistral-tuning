@@ -1,0 +1,21 @@
+# Install PyTorch first (see setup_conda.ps1 for CPU/CUDA index URL), then:
+pywavelets>=1.5
+librosa>=0.10
+soundfile>=0.12
+lightgbm>=4.3
+xgboost>=2.0
+copernicusmarine>=2.0
+transformers>=4.44,<4.47
+datasets>=2.18
+accelerate>=0.34,<0.35
+peft>=0.11
+trl>=0.9
+bitsandbytes>=0.43; platform_system != "Windows"
+sentencepiece>=0.2
+# bitsandbytes optional on Windows; omit for CPU-only LoRA experiments
+neuralforecast>=1.7
+einops>=0.7
+cartopy>=0.23
+geopandas>=1.0
+pyogrio>=0.7
+chronos-forecasting>=2.2

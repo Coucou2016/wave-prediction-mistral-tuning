@@ -1,0 +1,12 @@
+# Approximate NDBC deployment locations (public buoys) for map figures only.
+stations:
+  "41010": { lat: 31.404, lon: -80.868, name: "Gray's Reef" }
+  "42040": { lat: 29.212, lon: -88.207, name: "Mobile South" }
+  "44013": { lat: 42.346, lon: -70.651, name: "Boston approach" }
+  "46025": { lat: 33.749, lon: -119.053, name: "Santa Monica Basin" }
+  "46026": { lat: 37.755, lon: -122.839, name: "San Francisco" }
+  "46042": { lat: 36.785, lon: -122.398, name: "Monterey" }
+  "46047": { lat: 32.404, lon: -119.509, name: "Tanner Banks" }
+  "46246": { lat: 32.749, lon: -117.422, name: "San Diego" }
+  "51000": { lat: 23.546, lon: -154.056, name: "North Pacific" }
+  "51002": { lat: 17.146, lon: -157.752, name: "Southwest Hawaii" }

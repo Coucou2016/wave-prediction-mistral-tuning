@@ -1,0 +1,21 @@
+# Data source endpoints and defaults (no fabricated observations).
+ndbc:
+  historical_stdmet_base: "https://www.ndbc.noaa.gov/data/historical/stdmet"
+  realtime2_base: "https://www.ndbc.noaa.gov/data/realtime2"
+  gzip: true
+
+cmems:
+  # Discrete insitu wave; hourly aggregation dataset id (adjust via copernicusmarine describe)
+  product_id: "INSITU_GLO_WAV_DISCRETE_MY_013_045"
+  dataset_id: "cmems_obs-ins_glo_wav_my_na_PT1H"
+  output_subdir: "cmems"
+
+cdip:
+  # THREDDS OPeNDAP; some networks return 403 to datacenter IPs — retry locally if needed.
+  thredds_host: "https://thredds.cdip.ucsd.edu"
+  catalog_archive: "/thredds/catalog/cdip/archive/catalog.html"
+  dods_template: "/thredds/dodsC/cdip/archive/{deployment}/{deployment}_historic.nc"
+
+emodnet:
+  enabled: false
+  note: "Enable when a stable bulk API URL is configured for your use case."

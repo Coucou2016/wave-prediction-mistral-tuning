@@ -1,0 +1,12 @@
+{
+  "base": {
+    "mean_rmse": 1.2710926958757351,
+    "json_valid_rate": 1.0,
+    "n": 24
+  },
+  "lora": {
+    "mean_rmse": 0.6990227680261466,
+    "json_valid_rate": 1.0,
+    "n": 24
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "times_new_roman_available": true,
+  "serif_rc": [
+    "DejaVu Serif",
+    "Bitstream Vera Serif",
+    "Computer Modern Roman",
+    "New Century Schoolbook",
+    "Century Schoolbook L",
+    "Utopia",
+    "ITC Bookman",
+    "Bookman",
+    "Nimbus Roman No9 L",
+    "Times New Roman",
+    "Times",
+    "Palatino",
+    "Charter",
+    "serif"
+  ],
+  "sample_serif_fonts": [
+    "DejaVu Serif",
+    "DejaVu Serif Display",
+    "MS Reference Sans Serif",
+    "Microsoft Sans Serif",
+    "Times New Roman"
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "base_model": "D:\\Projects\\wave-prediction-mistral-tuning\\models\\mistral\\Mistral-7B-Instruct-v0.3",
+  "task": "curve_forecast",
+  "train_samples": 1024,
+  "horizon_hours": 24
+}

@@ -1,0 +1,21 @@
+name: wave_llm
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - numpy>=1.26
+  - pandas>=2.1
+  - scipy>=1.11
+  - xarray>=2024.1
+  - netcdf4
+  - h5netcdf
+  - pyarrow
+  - dask
+  - matplotlib
+  - scikit-learn
+  - statsmodels
+  - pyyaml
+  - requests
+  - tqdm
+  - pip
