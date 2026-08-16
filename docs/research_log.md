@@ -7,20 +7,18 @@ Separated from `paper/manuscript.md` so the paper stays free of tooling traces.
 - URL: https://chatgpt.com/c/6a81efce-fc5c-83ea-a615-54eae70ac13e  
 - Title: 学术论文真实性审计 / 论文精修  
 - Protocol: public GitHub Markdown URLs only; no uploads.
+- Rounds: R1 authenticity → R2 Abstract/Intro → R3 Related Work → R4 Methods → R5 Results/Discussion → R6 Captions/Data/OE.
 
-## R1 authenticity landing (2026-08-17)
+## Local landings
 
-- Softened Chronos† wording; fixed non-monotonic lead RMSE language.
-- Classification: observation-only; severe imbalance caveat.
-- Removed ChatGPT/nature-writing/script path headers from manuscript.
-- Softened unverified \(1.6\times10^5\) row count; kept 10 station IDs.
-- Sanitized `curve_lora_meta_v2.json` absolute Windows path.
+- Manuscript rewritten to submission tone; process notes removed.
 - Compression mean/trend/last-6 verified against `src/wave_llm/nxt/curve_jsonl_export.py`.
+- `paper/metrics/curve_lora_meta_v2.json` absolute Windows path removed.
+- SciencePlots figures remain under `paper/figures/` (generated via `scripts/`).
 
 ## Local SSOT
 
-- `paper/metrics/*.json`  
-- Figures: `paper/figures/` via SciencePlots scripts under `scripts/`.
+- `paper/metrics/*.json`
 
 ## Prior adviser thread
 

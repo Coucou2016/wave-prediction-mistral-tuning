@@ -1,7 +1,6 @@
 # Schema-constrained significant-wave-height forecasting with instruction-tuned language models: 24-h JSON trajectories and sea-state labels from NDBC buoys
 
-**Target journal:** *Ocean Engineering* (methods / ocean forecasting)  
-**Manuscript version:** 3.2 (2026-08-17) — metrics frozen to public SSOT under the companion repository.
+**Target journal:** *Ocean Engineering* (methods / ocean forecasting)
 
 **One-sentence argument.** On a pilot NDBC buoy evaluation, instruction-tuned Mistral-7B-Instruct-v0.3 with LoRA recovers parseable JSON `hs_forecast_m` curves and companion sea-state labels relative to the pretrained Base model, while remaining numerically close to—but not superior to—Persistence under transparent lead-alignment caveats.
 
@@ -93,19 +92,41 @@ We assemble an hourly multi-station NDBC panel after quality control and resampl
 
 ## 4. Methods
 
-### 4.1 Instruction schema and compression
+### 4.1 Schema-constrained instruction outputs
 
-Early curve fine-tuning attempts that packed full 168-hour \(T_p\)/wind sequences into the prompt were truncated by sequence-length limits. The configuration used for the reported adapters retains the full hourly `history_hs_m` series and compresses auxiliary channels to Hs summary statistics plus \(T_p\)/wind **mean / trend / last-6** summaries (verified against the released JSONL export implementation), with a maximum sequence length of 2048 tokens and gradient checkpointing.
+The primary task maps an issue-time history to a machine-readable JSON object containing the significant-wave-height forecast field `hs_forecast_m`. This field is defined as an ordered array of 24 numeric values corresponding to hourly forecast leads \(+1,\ldots,+24\) h. The same output schema is used when evaluating the pretrained Mistral Base model and the curve LoRA adapter so that adaptation is assessed under a common interface.
 
-### 4.2 LoRA fine-tuning
+The companion classification task is handled by a separate adapter rather than by a joint multitask model. Its target schema contains `wave_regime` and `predictability_24h` labels together with textual note fields. Consequently, curve forecasting and companion classification constitute separate instruction-tuning tasks and their performance is evaluated separately.
 
-Curve LoRA uses Mistral-7B-Instruct-v0.3 with **1024** training samples and a **24 h** horizon. Classification LoRA is a separate adapter trained on regime/predictability JSON targets.
+For the curve task, JSON validity is a syntactic/schema-level criterion. An output is counted as valid when it can be parsed as JSON and satisfies the required curve schema, including a numeric `hs_forecast_m` array of length 24. JSON validity does not measure forecast accuracy, physical plausibility, probabilistic calibration, or the factual quality of textual fields. The reported validity rate therefore refers only to this parse-and-schema layer on the n = 24 curve-evaluation windows.
 
-### 4.3 Metrics
+### 4.2 Issue-time windowing
 
-- Curve: mean RMSE / MAE over valid JSON samples; RMSE-by-lead; JSON validity rate.
-- Classification: regime accuracy; predictability accuracy.
-- Fairness note: LightGBM/Chronos RMSE on the curve subset is aggregated at configured numeric leads (†), not a full 24-step dense curve unless the numeric model emits one.
+Each forecast sample is anchored at an issue time \(t_0\). Historical input terminates at \(t_0\), and the prediction target comprises observed Hs at hourly leads \(t_0+1,\ldots,t_0+24\) h. Thus, the value at \(t_0\) belongs to the available history rather than to the forecast target.
+
+All historical sequences and compressed summary features supplied to the instruction are constructed from information available no later than \(t_0\). Future observations within the \(+1\) to \(+24\) h verification interval are used only as targets for evaluation and are not included in the model input. This issue-time convention is applied consistently when constructing the reported curve windows.
+
+### 4.3 History representation and prompt compression
+
+The curve instruction retains the complete `history_hs_m` sequence because the recent evolution of Hs is the principal temporal signal for the forecasting task. Hs summary statistics are additionally supplied as compact contextual features. In contrast, the auxiliary peak-period (\(T_p\)) and wind channels are compressed rather than inserted as full historical sequences. For each auxiliary channel, the input contains its mean, trend, and most recent six values.
+
+This representation was adopted to reduce instruction length while preserving the full Hs trajectory and selected recent and aggregate information from the auxiliary variables. The reported training configuration uses a maximum sequence length of 2048 tokens. Gradient checkpointing is enabled during training to reduce memory demand; it is a training-memory mechanism and does not alter the issue-time information available to the model.
+
+### 4.4 LoRA adaptation
+
+The base language model is Mistral-7B-Instruct-v0.3. The curve adapter is trained with Low-Rank Adaptation (LoRA) using 1024 training samples, with each target representing a 24-h hourly Hs trajectory under the schema defined in Section 4.1. The pretrained Base model and the adapted model are evaluated with the same curve-task instruction format and output schema.
+
+The companion regime/predictability task uses a separate LoRA adapter trained against its own classification JSON targets. No joint curve-and-classification multitask objective is used. Accordingly, an improvement or degradation in a companion classification metric should not be interpreted as an effect of a jointly optimized curve-forecasting objective.
+
+Only training settings verified for the reported experiment are specified here. Unverified LoRA or optimizer hyperparameters are not inferred from model defaults.
+
+### 4.5 Evaluation metrics and lead alignment
+
+For each valid 24-step curve output, predicted Hs values are aligned with observations at the corresponding hourly leads. Root-mean-square error (RMSE) and mean absolute error (MAE) are computed on the aligned curve, and the reported curve-level summaries aggregate these errors across the evaluation windows. Lead-wise RMSE is additionally calculated at each of the 24 forecast leads to characterize the dependence of error on forecast horizon. JSON validity is reported separately from these numerical error metrics. The companion adapter is evaluated using raw accuracy for `wave_regime` and `predictability_24h`.
+
+Persistence is naturally defined across the complete 24-h horizon and can therefore be evaluated on the same dense hourly targets as the Mistral curves. LightGBM† and Chronos† require a different interpretation. On the curve-evaluation windows, their reported RMSE values are aggregated only over their configured numeric forecast leads. The dagger (†) explicitly denotes this lead-selection protocol. These values therefore share the reported evaluation-window context but are not dense 24-step RMSE estimates directly equivalent to the Mistral or Persistence curves.
+
+The † results are retained as protocol-aware numerical references rather than as a basis for model-class ranking. In particular, differences involving LightGBM† or Chronos† should not be interpreted as evidence of superiority or inferiority under a fully lead-matched 24-step benchmark.
 
 ---
 
@@ -115,15 +136,15 @@ Curve LoRA uses Mistral-7B-Instruct-v0.3 with **1024** training samples and a **
 
 | Method | Mean RMSE (m) | Notes |
 |--------|---------------|-------|
-| Persistence | 0.688 | Same eval windows |
-| LightGBM† | 0.698 | Configured numeric leads |
-| Chronos† | 0.951 | Configured numeric leads |
+| Persistence | 0.688 | Dense 24-h windows |
+| LightGBM† | 0.698 | Configured numeric leads (§4.5) |
+| Chronos† | 0.951 | Configured numeric leads (§4.5) |
 | Mistral Base | 1.271 | JSON valid = 1.0 |
 | Mistral LoRA | 0.699 | JSON valid = 1.0 |
 
-**Reading.** On this pilot evaluation, LoRA substantially improves over Base (1.271 → 0.699) and achieves an RMSE numerically close to Persistence (0.688) and LightGBM† (0.698). Chronos† shows a higher aggregated-lead RMSE under this protocol; because † scoring is not dense 24-step, we do not interpret that gap as evidence that Chronos is an inferior model class. We do **not** claim LoRA superiority or statistical equivalence to Persistence.
+On this pilot evaluation, LoRA substantially improves over Base (1.271 → 0.699) and achieves an RMSE numerically close to Persistence (0.688) and LightGBM† (0.698). Chronos† shows a higher aggregated-lead RMSE under the configured-lead protocol; because † scoring is not dense 24-step, that gap is not interpreted as evidence that Chronos is an inferior model class. No RMSE superiority or statistical equivalence to Persistence is claimed.
 
-Lead-wise RMSE profiles for Base and LoRA are shown in the accompanying figures. Errors are generally larger at later forecast leads, particularly in the latter part of the 24 h horizon, although the lead-wise RMSE profiles are not strictly monotonic.
+Lead-wise RMSE profiles for Base and LoRA (Fig. 2) show that errors are generally larger at later forecast leads, particularly in the latter part of the 24 h horizon, although the lead-wise profiles are not strictly monotonic.
 
 ### 5.2 Classification companion (n = 24)
 
@@ -132,30 +153,30 @@ Lead-wise RMSE profiles for Base and LoRA are shown in the accompanying figures.
 | Base | 0.042 | 0.375 |
 | LoRA | 0.417 | 0.250 |
 
-Regime accuracy increased from 0.042 to 0.417, whereas predictability accuracy decreased from 0.375 to 0.250. Given n = 24 and severe regime-label imbalance on the evaluation set (true labels dominated by a single regime class), these results are exploratory and do not establish robust classification skill.
+Regime accuracy increased from 0.042 to 0.417, whereas predictability accuracy decreased from 0.375 to 0.250. Given n = 24 and severe regime-label imbalance on the evaluation set (true labels dominated by a single regime class), these results are exploratory and do not establish robust classification skill. Because the companion adapter is trained separately from the curve adapter, the opposite directions of the two classification metrics are reported as observed outcomes rather than as evidence of a joint multitask trade-off.
 
 ### 5.3 Figures
 
-Main figures include: method-wise mean RMSE summary; lead-dependent Base versus LoRA RMSE; example multi-method Hs trajectories; and Base versus LoRA classification accuracy panels (SciencePlots rendering).
+Main figures summarize method-wise mean RMSE (Fig. 1), lead-dependent Base versus LoRA RMSE (Fig. 2), an example multi-method Hs trajectory panel (Fig. 3), and Base versus LoRA classification accuracy (Fig. 4).
 
 ---
 
 ## 6. Discussion
 
-The primary scientific value is **interface + evaluation discipline**, not a claim of RMSE dominance. Sequence-instruction fine-tuning yields machine-parseable Hs arrays with JSON validity of 1.0 on the reported set, while regime raw accuracy rises relative to Base under severe class imbalance. Predictability labels do not improve; free-text `reason`/`notes` fields in training targets remain partially template-like and should not be marketed as calibrated explanations.
+The contribution is best read as three layered forms of evidence rather than a single accuracy claim. First, schema-constrained generation: on the reported evaluation set, LoRA returns JSON curves with validity 1.0 under the shared interface. Second, numeric adaptation: Base→LoRA reduces mean RMSE from 1.271 to 0.699, recovering performance to a level numerically close to Persistence (0.688) without establishing superiority or statistical equivalence. Third, companion classification: raw regime accuracy rises under severe class imbalance, while predictability accuracy declines from 0.375 to 0.250 and must be retained as a negative result.
 
-Relative to Chronos-for-Hs studies [8] and Time-LLM-style reprogramming [10], our setting asks a different question: can an Instruct LLM serve as a **structured ocean output layer** beside strong numeric models? On the pilot numbers, LoRA recovers structured curve generation relative to Base and lands numerically close to Persistence on mean RMSE, while companion classification remains exploratory: raw regime accuracy rises relative to Base, but robust regime skill is not established, and predictability accuracy declines.
+Relative to Chronos-for-Hs studies [8] and text-LLM time-series reprogramming [10], the present question is whether an Instruct LLM can serve as a structured ocean-output layer beside strong numeric models. The pilot evidence supports that interface role for JSON curves, not an operational decision-support benefit that has not been measured here. Relative to Tan et al. [11], the Base→LoRA improvement is evidence that adaptation helps under the present instruction-and-schema protocol; it is not evidence that an LLM backbone is necessary or numerically superior to specialized forecasters. Free-text note fields remain partially template-like and are not treated as calibrated explanations.
 
 ---
 
 ## 7. Limitations
 
-1. **Pilot scale.** Curve and classification reported evaluations use **n = 24** windows; this is insufficient for operational certification or strong statistical ranking among near-tied methods (Persist 0.688 vs LoRA 0.699).
-2. **Station / label imbalance.** True regime labels in the classification evaluation are heavily skewed toward a single class (`storm_growth`), limiting interpretation of raw accuracy.
-3. **Lead aggregation asymmetry.** LightGBM/Chronos comparisons on the curve subset use configured leads (†), not identical dense 24-step curves.
+1. **Pilot scale.** Curve and classification evaluations use **n = 24** windows, which is insufficient for operational certification or strong ranking among near-tied methods (Persist 0.688 vs LoRA 0.699).
+2. **Label imbalance.** True regime labels are heavily skewed toward a single class, so raw regime accuracy is exploratory rather than evidence of robust classification skill.
+3. **Lead aggregation asymmetry.** LightGBM†/Chronos† comparisons use configured leads rather than dense 24-step curves (§4.5); model-class ranking under a fully lead-matched protocol is therefore unsupported.
 4. **Textual rationales.** Free-text fields are not validated for factual correctness or calibrated uncertainty.
-5. **Compute.** 7B Instruct LoRA requires GPU resources; Persistence/LightGBM remain far cheaper.
-6. **Metric provenance.** Panel-wide numeric baseline tables at fixed leads (e.g., 6/12/24/48/72 h) must not be mixed with the curve-subset means reported above.
+5. **Compute / deployment.** Controlled deployment cost benchmarks against Persistence and LightGBM were not performed; 7B Instruct LoRA remains a heavier model class than tabular or persistence baselines.
+6. **Incomplete hyperparameter disclosure.** Only verified training settings are stated in Section 4; remaining adapter hyperparameters should accompany the final reproducibility package.
 
 ---
 
@@ -167,11 +188,11 @@ We present an NDBC→JSON→Mistral-LoRA study for structured Hs curve generatio
 
 ## Data availability
 
-NDBC observations are publicly available from the U.S. National Data Buoy Center. Code, frozen evaluation metrics, and figure assets accompanying this manuscript are released at https://github.com/Coucou2016/wave-prediction-mistral-tuning. Large intermediate panels and model weights are not redistributed with the manuscript package; regeneration instructions are provided in the repository documentation.
+The NDBC observations used in this study are publicly accessible through the U.S. National Oceanic and Atmospheric Administration National Data Buoy Center (NOAA/NDBC). The code, frozen evaluation metrics, and figure assets supporting the reported analyses are publicly available in the companion GitHub repository: https://github.com/Coucou2016/wave-prediction-mistral-tuning. Derived intermediate data panels and model weights are not redistributed with the manuscript package; the repository documents the data-preparation and model-generation procedures required to reconstruct the reported workflow.
 
 ---
 
-## References (selected; verify DOIs before submission)
+## References
 
 1. Fan et al., *Ocean Engineering*, 2020. https://doi.org/10.1016/j.oceaneng.2020.107298  
 2. Domala et al., *JCDE*, 2022. https://doi.org/10.1093/jcde/qwac048  

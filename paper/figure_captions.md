@@ -1,11 +1,9 @@
-# Figure captions (SciencePlots assets)
+# Figure captions (submission-ready)
 
-**Source of numbers:** `paper/metrics/` (n=24 curve eval; 10 stations). † = LightGBM/Chronos at configured numeric leads only.
+**Fig. 1.** Mean significant-wave-height (Hs) RMSE on the curve evaluation set (n = 24 forecast windows from 10 NDBC stations). Persistence, LightGBM†, Chronos†, Mistral Base, and Mistral LoRA yield RMSEs of 0.688, 0.698, 0.951, 1.271, and 0.699 m, respectively. LoRA substantially reduces error relative to Base but does not outperform Persistence. †LightGBM and Chronos values are aggregated at configured numeric forecast leads and are not dense 24-step RMSE estimates.
 
-**Fig. 1 — `curve_method_rmse_summary.png`.** Mean RMSE on the held-out curve subset (n = 24). Persistence (0.688), LightGBM† (0.698), Chronos† (0.951), Mistral Base (1.271), and Mistral LoRA (0.699). LoRA improves over Base but does not beat Persistence on this pilot set.
+**Fig. 2.** Lead-wise RMSE of Mistral Base and Mistral LoRA over the 24-h Hs forecast horizon on the curve evaluation set (n = 24). Errors are generally larger at later forecast leads, particularly in the latter part of the horizon, although neither lead-wise profile is strictly monotonic.
 
-**Fig. 2 — `model_rmse_comparison_by_lead.png` / `curve_rmse_by_lead_lines.png`.** Hourly lead-dependent RMSE for Mistral Base versus LoRA over the 24 h horizon. Errors generally increase with lead, consistent with decaying predictability.
+**Fig. 3.** Example 24-h Hs forecast trajectories at NDBC station 41010, showing the observed history, verification observations, Persistence forecast, and Mistral Base and LoRA predictions. LightGBM† and Chronos† markers, where present, correspond only to their configured numeric forecast leads. The panel illustrates one forecast window and is not intended to represent performance across the full evaluation set.
 
-**Fig. 3 — `forecast_panel_mistral_lora_41010.png`.** Example multi-method Hs trajectories at station 41010: history, truth, Persistence, Mistral Base/LoRA curves, and optional LightGBM†/Chronos† markers at available leads.
-
-**Fig. 4 — `classification_base_vs_lora.png`.** Companion classification accuracy (n = 24): regime improves (0.042 → 0.417) while predictability decreases (0.375 → 0.250), showing task-dependent LoRA effects.
+**Fig. 4.** Raw companion-task classification accuracy for Mistral Base and LoRA (n = 24). Regime accuracy increases from 0.042 to 0.417 after adaptation, whereas predictability accuracy decreases from 0.375 to 0.250. Because the regime labels are strongly imbalanced, these results are exploratory and do not establish robust classification skill.
