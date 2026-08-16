@@ -16,8 +16,8 @@
 | 1 | Framework + literature + honest innovation | Done (web search + repo read) | **ADOPT** schema-constrained product framing; split adaptation vs superiority; companion≠joint multitask; demote predictability from title; SSOT=`paper/metrics`; matched-lead caveat. **REJECT** RMSE-win narrative. |
 | 2 | Related-work 3 clusters + EN paragraphs | Done | **ADOPT** Hs-ML / TSFM / LLM+skepticism spine; keep Zhai 2025 Chronos-Hs; **must-cite** Tan et al. 2024; Chronos = TS foundation model (not “LLM-TSFM”). |
 | 3 | Methods EN paragraphs | Done | **ADOPT** layered json_valid checklist; compression+LoRA recipe; † lead-alignment wording. |
-| 4 | Results wording with frozen v2 metrics | In flight / completed in-thread | **ADOPT** order: schema → adaptation → fair compare → lead → negative classification. |
-| 5 | Innovation / limitations / figure captions | Planned immediately after R4 | **ADOPT** expected: caption honesty for † and n=24. |
+| 4 | Results wording with frozen v2 metrics | Done | **ADOPT** order: schema → adaptation → fair compare → lead → negative classification. |
+| 5 | Innovation / limitations / figure captions | Done (streaming captions verified in UI) | **ADOPT** n=24 / † honesty in captions; mirror in `paper/figure_captions.md`. |
 
 ### Rate limit note
 Transient modal「请求过于频繁」appeared mid-Round-1; recovered after wait. No CAPTCHA/login failure.
